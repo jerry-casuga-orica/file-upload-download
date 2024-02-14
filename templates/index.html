@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload and Download</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>File Upload and Download</h1>
+        <div>
+            <h2>Upload a File</h2>
+            <form id="upload-form" enctype="multipart/form-data">
+                <input type="file" name="file" id="file-input">
+                <button type="submit" id="upload-button">Upload File</button>
+            </form>
+        </div>
+
+        <div>
+            <h2>Specify Target Languages for Translation</h2>
+            <form id="language-form">
+                <div class="column">
+                    <div>
+                        <input type="checkbox" id="english" name="languages" value="English">
+                        <label for="english">English</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="spanish" name="languages" value="Spanish">
+                        <label for="spanish">Spanish</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="french" name="languages" value="French">
+                        <label for="french">French</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="bahasa" name="languages" value="Bahasa">
+                        <label for="bahasa">Bahasa</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="portuguese" name="languages" value="Portuguese">
+                        <label for="portuguese">Portuguese</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="chinese" name="languages" value="Chinese">
+                        <label for="chinese">Chinese</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="afrikaans" name="languages" value="Afrikaans">
+                        <label for="afrikaans">Afrikaans</label>
+                    </div>
+                </div>
+                <button type="submit" id="translate-button">Translate</button>
+            </form>
+        </div>
+        
+        <div>
+            <h2>Uploaded Files</h2>
+            <ul id="file-list">
+                {% for file in files %}
+                    <li>
+                        <a href="/download/{{ file }}" download>{{ file }}</a>
+                        <form action="/delete/{{ file }}" method="POST" style="display: inline;">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#upload-form').submit(function(event) {
+                event.preventDefault();
+                var formData = new FormData(this);
+                $.ajax({
+                    type: 'POST',
+                    url: '/upload',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        alert(response); // show success message (you can customize this)
+                        // Update the list of files
+                        $.get('/', function(data) {
+                            $('#file-list').html($(data).find('#file-list').html());
+                        });
+                    }
+                });
+            });
+
+            $('#language-form').submit(function(event) {
+                event.preventDefault();
+                // Process the language selection here
+                var selectedLanguages = [];
+                $('input[name="languages"]:checked').each(function() {
+                    selectedLanguages.push($(this).val());
+                });
+                console.log("Selected Languages:", selectedLanguages);
+            });
+        });
+    </script>
+</body>
+</html>
